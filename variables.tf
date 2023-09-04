@@ -23,6 +23,12 @@ variable "tensorflow_version" {
   default     = null
 }
 
+variable "tgi_version" {
+  description = "TensorFlow version you want to use for executing your inference code. Defaults to `None`. Required unless `pytorch_version` is provided. [List of supported versions](https://huggingface.co/docs/sagemaker/reference#inference-dlc-overview)"
+  type        = string
+  default     = null
+}
+
 variable "image_tag" {
   description = "The image tag you want to use for the container you want to use. Defaults to `None`. The module tries to derive the `image_tag` from the `pytorch_version`, `tensorflow_version` & `instance_type`. If you want to override this, you can provide the `image_tag` as a variable."
   type        = string

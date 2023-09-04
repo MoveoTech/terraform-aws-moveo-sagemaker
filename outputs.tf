@@ -1,10 +1,10 @@
 # ------------------------------------------------------------------------------
 # Output
 # ------------------------------------------------------------------------------
-output "used_container" {
-  description = "Used container for creating the endpoint"
-  value       = data.aws_sagemaker_prebuilt_ecr_image.deploy_image.registry_path
-}
+# output "used_container" {
+#   description = "Used container for creating the endpoint"
+#   value       = data.aws_sagemaker_prebuilt_ecr_image.deploy_image[0].registry_path
+# }
 
 output "iam_role" {
   description = "IAM role used in the endpoint"
