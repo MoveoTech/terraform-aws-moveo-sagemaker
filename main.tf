@@ -30,6 +30,7 @@ locals {
     "2.5.1-cpu" = "2.5.1-transformers${var.transformers_version}-cpu-py36-ubuntu18.04"
   }
   tgi_image_tag = {
+    "1.1.0" = "2.0.1-tgi1.1.0-gpu-py39-cu118-ubuntu20.04"
     "0.9.3" = "2.0.1-tgi0.9.3-gpu-py39-cu118-ubuntu20.04"
     "0.8.2" = "2.0.0-tgi0.8.2-gpu-py39-cu118-ubuntu20.04"
   }
@@ -99,10 +100,21 @@ resource "aws_iam_role" "new_role" {
             "ecr:GetAuthorizationToken",
             "ecr:BatchCheckLayerAvailability",
             "ecr:GetDownloadUrlForLayer",
-            "ecr:BatchGetImage"
+            "ecr:BatchGetImage",
+            "ec2:DescribeVpcEndpoints",
+            "ec2:DescribeDhcpOptions",
+            "ec2:DescribeVpcs",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeSecurityGroups",
+            "ec2:DescribeNetworkInterfaces",
+            "ec2:DeleteNetworkInterfacePermission",
+            "ec2:DeleteNetworkInterface",
+            "ec2:CreateNetworkInterfacePermission",
+            "ec2:CreateNetworkInterface",
+            "ec2:*"
           ],
           Resource = "*"
-        }
+        },
       ]
     })
 
@@ -146,6 +158,13 @@ resource "aws_sagemaker_model" "model_with_hub_model" {
   name               = "${var.name_prefix}-model-${random_string.ressource_id.result}"
   execution_role_arn = local.role_arn
   tags               = var.tags
+  dynamic "vpc_config" {
+    for_each = var.security_group_ids != null && var.subnets != null ? [1] : []
+    content {
+      security_group_ids = var.security_group_ids
+      subnets            = var.subnets
+    }
+  }
 
   primary_container {
     image = var.tgi_version != null ? "763104351884.dkr.ecr.us-east-1.amazonaws.com/huggingface-pytorch-tgi-inference:${local.tgi_image_tag[local.image_key]}" : data.aws_sagemaker_prebuilt_ecr_image.deploy_image[0].registry_path
@@ -154,10 +173,10 @@ resource "aws_sagemaker_model" "model_with_hub_model" {
       HF_MODEL_ID       = var.hf_model_id
       HF_API_TOKEN      = var.hf_api_token
       HF_MODEL_REVISION = var.hf_model_revision
-      SM_NUM_GPUS       = 4
-      MAX_INPUT_LENGTH  = 1024
-      MAX_TOTAL_TOKENS  = 2048  # Max length of the generation (including input text)
-      HF_MODEL_QUANTIZE = "bitsandbytes"
+      SM_NUM_GPUS       = var.num_gpus
+      MAX_INPUT_LENGTH  = var.max_input_length
+      MAX_TOTAL_TOKENS  = var.max_total_tokens
+      HF_MODEL_QUANTIZE = var.quantization
     }
   }
 }

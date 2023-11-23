@@ -9,6 +9,7 @@ variable "name_prefix" {
 variable "transformers_version" {
   description = "Transformers version you want to use for executing your model training code. Defaults to None. [List of supported versions](https://huggingface.co/docs/sagemaker/reference#inference-dlc-overview)"
   type        = string
+  default     = "4.23.0"
 }
 
 variable "pytorch_version" {
@@ -144,4 +145,46 @@ variable "tags" {
   description = "A map of tags (key-value pairs) passed to resources."
   type        = map(string)
   default     = {}
+}
+
+variable "kms_key_id" {
+  description = "KMS key for async inference"
+  type        = string
+  default     = null
+}
+
+variable "num_gpus" {
+  description = "Number of instance GPUs"
+  type        = number
+  default     = 1
+}
+
+variable "max_input_length" {
+  description = "Number max tokens for inference"
+  type        = number
+  default     = 1024
+}
+
+variable "max_total_tokens" {
+  description = "Max length of the generation (including input text)"
+  type        = number
+  default     = 2048
+}
+
+variable "quantization" {
+  description = "Quantization type"
+  type        = string
+  default     = "bitsandbytes"
+}
+
+variable "security_group_ids" {
+  description = "List of security group IDs for SageMaker model"
+  type        = list(string)
+  default     = null
+}
+
+variable "subnets" {
+  description = "List of subnet IDs for SageMaker model"
+  type        = list(string)
+  default     = null
 }

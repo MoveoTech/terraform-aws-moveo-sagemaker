@@ -35,7 +35,7 @@ module "huggingface_sagemaker" {
   hf_model_id          = "Moveo/tangibly-patents"
   hf_task              = "text-generation"
   transformers_version = "4.23.0"
-  hf_api_token         = "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"
+  hf_api_token         = "hf_token"
   async_config = {
     # needs to be a s3 uri
     s3_output_path = "s3://${local.bucket_name}/outputs"
